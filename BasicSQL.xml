@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SqlCollection>
+  <SqlCommands>
+    
+    <!-- DBFMS -->
+    <!-- 基本SQL Collection-->
+    
+    <SQL Name="MergeBasicInfo">
+      <Summary>
+        腦中風Merge基本資料
+      </Summary>
+      <Command>
+        merge
+        INTO         ncva.casemain_tran AS cm
+        USING        (
+        SELECT    CASE.*
+        FROM      (
+        SELECT '0000' AS cmtypeid,
+        '0000' AS cmseqno
+        FROM   sysibm.dual
+        ) t
+        left join ncva.casemain_tran
+        CASE
+        ON        CASE.cmtypeid = :CMTYPEID
+        AND CASE.cmseqno = :CMSEQNO
+        ) AS tp
+        ON (
+        cm.cmtypeid = tp.cmtypeid
+        AND cm.cmseqno = tp.cmseqno )
+        WHEN matched THEN
+        UPDATE
+        SET              deptid = :Update_DEPTID ,
+        deptname = :Update_DEPTNAME ,
+        patfrom = :Update_PTFROM ,
+        personid = :Update_PERSONID ,
+        patname = :Update_PATNAME ,
+        patbirthday = :Update_PATBIRTHDAY ,
+        patsex = :Update_PATSEX ,
+        patheight = :Update_PATHEIGHT ,
+        patweight = :Update_PATWEIGHT ,
+        edulevelcode = :Update_EDULEVELCODE ,
+        zipcode = :Update_ZIPCODE ,
+        address = :Update_ADDRESS ,
+        pattel = :Update_PATTEL ,
+        patfriendtel = :Update_PATFRIENDTEL ,
+        patmobile = :Update_PATMOBILE ,
+        ocpcode = :Update_OCPCODE ,
+        otherocpname = :Update_OTHEROCPNAME ,
+        reachwaycode = :Update_REACHWAYCODE ,
+        levoption = :Update_LEVOPTION ,
+        deadthdate = :Update_DEADTHDATE ,
+        deadreason = :Update_DEADREASON ,
+        deadreasonothertext = :Update_DEADREASONOTHERTEXT ,
+        referraldnt = :Update_REFERRALDNT ,
+        referralhospitalname = :Update_REFERRALHOSPITALNAME ,
+        rehabildate = :Update_REHABILDATE ,
+        inpid = :Update_INPID ,
+        inpnm = :Update_INPNM ,
+        csstatus = :Update_CSSTATUS ,
+        hnursta = :Update_HNURSTA ,
+        hbed = :Update_HBED ,
+        sect = :Update_SECT ,
+        hdiagtxt = :Update_HDIAGTXT ,
+        hdiagicd = :Update_HDIAGICD ,
+        hdiagcod = :Update_HDIAGCOD ,
+        patfriendname = :Update_PATFRIENDNAME ,
+        hdocnamc = :Update_HDOCNAMC ,
+        istmpsaved = :Update_ISTMPSAVED
+        WHEN NOT matched THEN
+        INSERT (
+        cmtypeid,
+        cmseqno,
+        deptid,
+        deptname,
+        patfrom,
+        personid,
+        patname,
+        patsex,
+        patbirthday,
+        patheight,
+        patweight,
+        edulevelcode,
+        zipcode,
+        address,
+        pattel,
+        patfriendtel,
+        patmobile,
+        ocpcode,
+        otherocpname,
+        reachwaycode,
+        levoption,
+        deadthdate,
+        deadreason,
+        deadreasonothertext,
+        referraldnt,
+        referralhospitalname,
+        rehabildate,
+        inpid,
+        inpnm,
+        csstatus,
+        hnursta,
+        hbed,
+        sect,
+        hdiagtxt,
+        hdiagicd,
+        hdiagcod,
+        opendate,
+        opentime,
+        openpid,
+        openpnm,
+        patfriendname,
+        hdocnamc )
+        VALUES (
+        :Insert_CMTYPEID ,
+        :Insert_CMSEQNO ,
+        :Insert_DEPTID ,
+        :Insert_DEPTNAME ,
+        :Insert_PTFROM ,
+        :Insert_PERSONID ,
+        :Insert_PATNAME ,
+        :Insert_PATSEX ,
+        :Insert_PATBIRTHDAY ,
+        :Insert_PATHEIGHT ,
+        :Insert_PATWEIGHT ,
+        :Insert_EDULEVELCODE ,
+        :Insert_ZIPCODE ,
+        :Insert_ADDRESS ,
+        :Insert_PATTEL ,
+        :Insert_PATFRIENDTEL ,
+        :Insert_PATMOBILE ,
+        :Insert_OCPCODE ,
+        :Insert_OTHEROCPNAME ,
+        :Insert_REACHWAYCODE ,
+        :Insert_LEVOPTION ,
+        :Insert_DEADTHDATE ,
+        :Insert_DEADREASON ,
+        :Insert_DEADREASONOTHERTEXT ,
+        :Insert_REFERRALDNT ,
+        :Insert_REFERRALHOSPITALNAME ,
+        :Insert_REHABILDATE ,
+        :Insert_INPID ,
+        :Insert_INPNM ,
+        :Insert_CSSTATUS ,
+        :Insert_HNURSTA ,
+        :Insert_HBED ,
+        :Insert_SECT ,
+        :Insert_HDIAGTXT ,
+        :Insert_HDIAGICD ,
+        :Insert_HDIAGCOD ,
+        :Insert_OPENDATE ,
+        :Insert_OPENTIME ,
+        :Insert_OPENPID ,
+        :Insert_OPENPNM ,
+        :Insert_PATFRIENDNAME ,
+        :Insert_HDOCNAMC )
+
+      </Command>
+    </SQL>
+    <SQL Name="MergeTimesheetInfo">
+      <Summary>
+        腦中風Merge時間表資料
+      </Summary>
+      <Command>
+        merge
+        INTO         ncva.timesheet_tran AS tm
+        USING        (
+        SELECT    CASE.*
+        FROM      (
+        SELECT '0000' AS cmtypeid,
+        '0000' AS cmseqno
+        FROM   sysibm.dual
+        ) t
+        left join ncva.timesheet_tran
+        CASE
+        ON        CASE.cmtypeid = :CMTYPEID
+        AND CASE.cmseqno = :CMSEQNO
+        ) AS tp
+        ON (
+        tm.cmtypeid = tp.cmtypeid
+        AND tm.cmseqno = tp.cmseqno )
+        WHEN matched THEN
+        UPDATE
+        SET              occdate = :Update_OCCDATE ,
+        occtime = :Update_OCCTIME ,
+        arrdate = :Update_ARRDATE ,
+        arrtime = :Update_ARRTIME ,
+        drvsdate = :Update_DRVSDATE ,
+        drvstime = :Update_DRVSTIME ,
+        ctmridate = :Update_CTMRIDATE ,
+        ctmritime = :Update_CTMRITIME ,
+        hdisdt = :Update_HDISDT ,
+        hadmdt = :Update_HADMDT ,
+        hadmtm = :Update_HADMTM ,
+        isivtpacheck = :Update_ISIVTPACHECK ,
+        ivtpaplace = :Update_IVTPAPLACE ,
+        ivtpaplacename = :Update_IVTPAPLACENAME ,
+        ivtpadate = :Update_IVTPADATE ,
+        ivtpatime = :Update_IVTPATIME ,
+        ivtpareason = :Update_IVTPAREASON ,
+        ivtpasubreason = :Update_IVTPASUBREASON ,
+        ivtpadoze = :Update_IVTPADOZE ,
+        ivtpaothertext = :Update_IVTPAOTHERTEXT ,
+        inpid = :Update_INPID ,
+        inpnm = :Update_INPNM ,
+        istmpsaved = :Update_ISTMPSAVED
+        WHEN NOT matched THEN
+        INSERT (
+        cmtypeid,
+        cmseqno,
+        occdate,
+        occtime,
+        arrdate,
+        arrtime,
+        drvsdate,
+        drvstime,
+        ctmridate,
+        ctmritime,
+        hdisdt,
+        hadmdt,
+        hadmtm,
+        isivtpacheck,
+        ivtpaplace,
+        ivtpaplacename,
+        ivtpadate,
+        ivtpatime,
+        ivtpareason,
+        ivtpasubreason ,
+        ivtpadoze,
+        ivtpaothertext,
+        inpid,
+        inpnm )
+        VALUES (
+        :Insert_CMTYPEID ,
+        :Insert_CMSEQNO ,
+        :Insert_OCCDATE ,
+        :Insert_OCCTIME ,
+        :Insert_ARRDATE ,
+        :Insert_ARRTIME ,
+        :Insert_DRVSDATE ,
+        :Insert_DRVSTIME ,
+        :Insert_CTMRIDATE ,
+        :Insert_CTMRITIME ,
+        :Insert_HDISDT ,
+        :Insert_HADMDT ,
+        :Insert_HADMTM ,
+        :Insert_ISIVTPACHECK ,
+        :Insert_IVTPAPLACE ,
+        :Insert_IVTPAPLACENAME ,
+        :Insert_IVTPADATE ,
+        :Insert_IVTPATIME ,
+        :Insert_IVTPAREASON ,
+        :Insert_IVTPASUBREASON ,
+        :Insert_IVTPADOZE ,
+        :Insert_IVTPAOTHERTEXT ,
+        :Insert_INPID ,
+        :Insert_INPNM )
+      </Command>
+    </SQL>
+    <SQL Name="SelectCASSEMAINByCMSEQNO">
+      <Summary>
+        查詢資料
+      </Summary>
+      <Command>
+        Select NCVA.CASEMAIN_TRAN.*,NCVA.DEFCODE_REF.DESCRIPTION as StatusName
+               ,NCVA.HISCASE_TRAN.HHISNUM,NCVA.HISCASE_TRAN.HCASENO,NCVA.HISCASE_TRAN.HCASETYP
+        From NCVA.CASEMAIN_TRAN
+          Inner Join NCVA.HISCASE_TRAN
+        ON NCVA.CASEMAIN_TRAN.CMSEQNO = NCVA.HISCASE_TRAN.CMSEQNO
+        Left Join NCVA.DEFCODE_REF
+        ON NCVA.CASEMAIN_TRAN.CSSTATUS = NCVA.DEFCODE_REF.CODEID
+        AND NCVA.DEFCODE_REF.CODEBOOKID = 'CASESTATUS'
+        Where NCVA.CASEMAIN_TRAN.CMSEQNO = :CMSEQNO
+      </Command>
+    </SQL>
+  </SqlCommands>
+</SqlCollection>
