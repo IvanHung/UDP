@@ -1,21 +1,22 @@
 package com.aimportal.DataAccess.Command;
 
 
+import com.aimportal.DataAccess.Parameter.dbParameter;
+
 import javax.sql.rowset.CachedRowSet;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * Created by IvanHung on 2017/4/18.
  */
-public interface IDbCommand<T> {
-    CachedRowSet executeQuery(String scriptName) throws SQLException;
+public interface IDbCommand {
+    //CachedRowSet executeQuery(String scriptName) throws SQLException;
     CachedRowSet executeQuery() throws SQLException;
-    int executeNonQuery(String scriptName) throws SQLException;
+    //int executeNonQuery(String scriptName) throws SQLException;
     int executeNonQuery() throws  SQLException;
-    void beginTransaction() throws SQLException;
+
     void setScript(String scriptName);
-    void setParameter(String Parametername, T ParameterValue) throws SQLException;
+    void loadScripts(String filepath);
+    void setParameter(dbParameter parameter) throws SQLException;
     void close() throws SQLException;
 }

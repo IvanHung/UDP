@@ -1,23 +1,16 @@
 package com.aimportal.DataAccess.Command;
 
-import com.aimportal.Config.DBConf;
 import com.aimportal.DataAccess.Connection.IDbConnection;
-import com.aimportal.DataAccess.Parameter.IParameter;
-import com.aimportal.DataAccess.Transaction.IDbTransaction;
-import com.mysql.jdbc.MySQLConnection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.exceptions.MySQLDataException;
+import com.aimportal.DataAccess.Parameter.dbParameter;
 
 import javax.sql.rowset.CachedRowSet;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.Properties;
 
 /**
  * Created by Ivan Hung on 2017/4/17.
  */
-public class MySQLCommand implements IDbCommand,AutoCloseable {
+public class MySQLCommand implements IDbCommand {
     static final String  DBType = "MySQL";
 
     private Properties prop;
@@ -47,18 +40,8 @@ public class MySQLCommand implements IDbCommand,AutoCloseable {
     }
 
     @Override
-    public CachedRowSet executeQuery(String scriptName) throws SQLException {
-        return null;
-    }
-
-    @Override
     public CachedRowSet executeQuery() throws SQLException {
         return null;
-    }
-
-    @Override
-    public int executeNonQuery(String scriptName) throws SQLException {
-        return 0;
     }
 
     @Override
@@ -67,17 +50,17 @@ public class MySQLCommand implements IDbCommand,AutoCloseable {
     }
 
     @Override
-    public void beginTransaction() throws SQLException {
-
-    }
-
-    @Override
     public void setScript(String scriptName) {
 
     }
 
     @Override
-    public void setParameter(String parameterName, Object parameterValue) throws SQLException {
+    public void loadScripts(String filepath) {
+
+    }
+
+    @Override
+    public void setParameter(dbParameter parameter) throws SQLException {
 
     }
 }

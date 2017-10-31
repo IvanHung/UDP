@@ -1,6 +1,5 @@
 package com.aimportal.DataAccess.Connection;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -18,11 +17,8 @@ import java.util.Properties;
  */
 public interface IDbConnection{
     void close() throws SQLException;
-    void open() throws SQLException;
+    void open(Properties prop) throws SQLException;
     void commit() throws SQLException;
     void rollback() throws SQLException;
     PreparedStatement CreateStatement(String SQLScript) throws SQLException;
-    void setAutoCommit(boolean isAutoCommit) throws SQLException;
-
-
 }

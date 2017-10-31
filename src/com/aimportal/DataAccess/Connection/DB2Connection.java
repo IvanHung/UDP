@@ -1,33 +1,37 @@
 package com.aimportal.DataAccess.Connection;
 
-import com.aimportal.Config.DBConf;
-import com.ibm.db2.jcc.DB2PreparedStatement;
 import com.ibm.db2.jcc.uw.DB2Exception;
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * Created by IvanHung on 2017/4/27.
  */
 public class DB2Connection extends Connection implements IDbConnection {
-    static final String  DBType = "DB2";
+
     private com.ibm.db2.jcc.DB2Connection DB2CONN;
+
     @Override
     public void close() throws SQLException {
         DB2CONN.close();
     }
 
     @Override
-    public void open() {
+    public void open(Properties prop) {
         try{
-            prop = DBConf.loadConfig(DBType);//load properties
+            //prop = DBConf.loadConfig(DBType);//load properties
+            /*DB2連線特別的設定*/
+            //DB2大型主機上Charset編碼設定
+            System.setProperty("db2.jcc.charsetDecoderEncoder","3");
+            //prop設定開啟BindByName
+            prop.setProperty("enableNamedParameterMarkers","1");
             if(prop != null){
                 DriverManager.registerDriver(new com.ibm.db2.jcc.DB2Driver());
                 String URL = prop.getProperty("host");
                 DB2CONN = (com.ibm.db2.jcc.DB2Connection)DriverManager.getConnection(URL,prop);
-
             }
             else
                 throw new DB2Exception("Necessary DbConfig(properties) missing");
@@ -52,11 +56,5 @@ public class DB2Connection extends Connection implements IDbConnection {
     public PreparedStatement CreateStatement(String SQLScript) throws SQLException {
         return DB2CONN.prepareStatement(SQLScript);
     }
-
-    @Override
-    public void setAutoCommit(boolean isAutoCommit) throws SQLException {
-        DB2CONN.setAutoCommit(isAutoCommit);
-    }
-
 
 }

@@ -6,6 +6,7 @@ import com.mysql.jdbc.exceptions.MySQLDataException;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * Created by IvanHung on 2017/4/27.
@@ -24,8 +25,9 @@ public class MySQLConnection extends Connection implements IDbConnection{
         }
     }
 
+
     @Override
-    public void open() {
+    public void open(Properties prop) {
         try{
             prop = DBConf.loadConfig(DBType);//load properties
             if(prop != null){
@@ -58,11 +60,4 @@ public class MySQLConnection extends Connection implements IDbConnection{
         return  MySQLConn.prepareStatement(SQLScript);
 
     }
-
-    @Override
-    public void setAutoCommit(boolean isAutoCommit) throws SQLException {
-        MySQLConn.setAutoCommit(isAutoCommit);
-    }
-
-
 }

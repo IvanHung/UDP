@@ -1,9 +1,5 @@
 package com.aimportal.DataAccess.Base;
 
-import com.aimportal.DataAccess.Base.Database;
-
-import static com.aimportal.DataAccess.Base.Database.DB2;
-
 /**
  * Created by Ivan Hung on 2017/4/17.
  */

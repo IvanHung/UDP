@@ -1,53 +1,45 @@
 package com.aimportal.DataAccess.Command;
 
 import com.aimportal.DataAccess.Connection.DB2Connection;
+import com.aimportal.DataAccess.Constant.JDBCType;
+import com.aimportal.DataAccess.Parameter.dbParameter;
 import com.aimportal.Xml.Xml;
 import com.ibm.db2.jcc.DB2PreparedStatement;
+import com.ibm.db2.jcc.DB2ResultSet;
+import com.sun.rowset.CachedRowSetImpl;
+import org.dom4j.DocumentException;
+
 import javax.sql.rowset.CachedRowSet;
-import javax.sql.rowset.RowSetProvider;
-import java.sql.Date;
-import java.sql.PreparedStatement;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.sql.Time;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.ibm.db2.jcc.DB2ResultSet;
+import java.sql.Timestamp;
+import java.util.Properties;
 
 /**
  * Created by IvanHung on 2017/4/17.
  */
-public class DB2Command extends DBCommand implements IDbCommand {
-    /*建立DBCommand時，載入 SQL Script，不採取事先將Script載入PreparedStatement，會造成DB有Parse但未execute的成本
+public class DB2Command extends DBCommand{
+    /* 建立DBCommand時，載入 SQL Script，
+    *  不採取事先將Script載入PreparedStatement，
+    *  會造成DB有Parse但未execute的成本
     *
     * */
-    static final String  DBType = "DB2";
-    //private IDbConnection Conn;
-    private DB2Connection DB2CONN;
+    //private DB2Connection DB2CONN;
     private DB2PreparedStatement db2prep;
     private DB2ResultSet db2Rst;
     private String CommandScript;
-    public Map<String,PreparedStatement> Transaction;
+
 
     /*
-    * 現在的問題是：
-    * 如何處理sql script,
-    * option1:建立HashMap<scriptname,preparedstatement>
     *
     * */
-    public DB2Command(){
-        //Precondition of Constructor
-        //1. load sql script from xml
+    public DB2Command(Properties p){
         try{
-            SQLScript = new HashMap<String,String>();
-            //Test
-            Xml x = new Xml();
-            x.loadXMLFile();
-            SQLScript = x.parseSQLScript();
-            //EndTest
-            DB2CONN = new com.aimportal.DataAccess.Connection.DB2Connection();
-            DB2CONN.open();
-
+            prop = p;
+            sqlxml = new Xml();
+            DbConnection = new DB2Connection();
+            DbConnection.open(prop);
         }
         catch(Exception ex){
             ex.printStackTrace();
@@ -56,43 +48,15 @@ public class DB2Command extends DBCommand implements IDbCommand {
 
     @Override
     protected void finalize() throws Throwable {
-        if(DB2CONN != null)
-            DB2CONN.close();
-        //super.finalize();
-    }
-
-
-    @Override
-    public CachedRowSet executeQuery(String scriptName) throws SQLException{
-        try{
-            String exeSql = SQLScript.get(scriptName);
-
-            db2prep = (DB2PreparedStatement)DB2CONN.CreateStatement(exeSql);
-            db2Rst = (com.ibm.db2.jcc.am.ResultSet)db2prep.executeQuery();
-            crs = RowSetProvider.newFactory().createCachedRowSet();
-            crs.populate(db2Rst);
-        }
-        catch(SQLException sqlex){
-            throw sqlex;
-        }
-        catch(Exception ex){
-            ex.printStackTrace();
-        }
-        finally {
-            DB2CONN.close();
-        }
-        return crs;
+        if(DbConnection != null)
+            DbConnection.close();
     }
 
     @Override
     public CachedRowSet executeQuery() throws SQLException {
         try{
-
-            //DB2CONN = new com.aimportal.DataAccess.Connection.DB2Connection();
-            //DB2CONN.open();
-            //db2prep = (DB2PreparedStatement)DB2CONN.CreateStatement(CommandScript);
             db2Rst = (com.ibm.db2.jcc.am.ResultSet)db2prep.executeQuery();
-            crs = RowSetProvider.newFactory().createCachedRowSet();
+            crs = new CachedRowSetImpl();
             crs.populate(db2Rst);
         }
         catch(SQLException sqlex){
@@ -102,22 +66,20 @@ public class DB2Command extends DBCommand implements IDbCommand {
             ex.printStackTrace();
         }
         finally {
-            DB2CONN.close();
+            db2prep.close();
         }
         return crs;
 
     }
 
     @Override
-    public int executeNonQuery(String scriptName) throws SQLException {
+    public int executeNonQuery() throws SQLException {
         int rowsNum = 0;
         try {
-            DB2CONN = new com.aimportal.DataAccess.Connection.DB2Connection();
-            DB2CONN.open();
-
-            String exeSql = SQLScript.get(scriptName);
-            db2prep = (DB2PreparedStatement)DB2CONN.CreateStatement(exeSql);
+            String exeSql = sqlxml.getScript(CommandScript);
+            db2prep = (DB2PreparedStatement)DbConnection.CreateStatement(exeSql);
             rowsNum = db2prep.executeUpdate();
+
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -129,59 +91,73 @@ public class DB2Command extends DBCommand implements IDbCommand {
     }
 
     @Override
-    public int executeNonQuery() throws SQLException {
-        int rowsNum = 0;
-        return rowsNum;
-    }
-
-    @Override
-    public void beginTransaction() throws SQLException {
-        if(DB2CONN != null)
-            DB2CONN.setAutoCommit(true);
-        else
-            throw new SQLException("Fatal Error：setAutoCommit on null Connection.");
-        Transaction = new HashMap<String,PreparedStatement>();
-    }
-
-    @Override
     public void setScript(String scriptName) {
         try{
-            CommandScript = SQLScript.get(scriptName);
-            db2prep = (DB2PreparedStatement)DB2CONN.CreateStatement(CommandScript);
-            //CommandScript = SQLScript.get(scriptName);
+            if(sqlxml != null){
+                CommandScript = sqlxml.getScript(scriptName);
+                db2prep = (DB2PreparedStatement)DbConnection.CreateStatement(CommandScript);
+            }
+
+            else
+                throw new FileNotFoundException("File Not Found");
         }
         catch(Exception ex){
             ex.printStackTrace();
         }
 
     }
+    @Override
+    public void loadScripts(String filePath) {
+        try {
+            sqlxml.loadXMLFile(filePath);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
-    public void setParameter(String parameterName, Object parameterValue) throws SQLException {
-        String type = parameterValue.getClass().getSimpleName();
-        switch(type.toLowerCase()){
-            case "integer":
-                db2prep.setJccIntAtName(parameterName,(int)parameterValue);
-                break;
-            case "string":
-                db2prep.setJccStringAtName(parameterName,(String)parameterValue);
-                break;
-            case "float":
-                db2prep.setJccFloatAtName(parameterName,(float)parameterValue);
-                break;
-            case "date":
-                db2prep.setJccDateAtName(parameterName,(Date) parameterValue);
-                break;
-            case "time":
-                db2prep.setJccTimeAtName(parameterName,(Time) parameterValue);
-                break;
-
+    public void setParameter(dbParameter parameter) throws SQLException {
+        try {
+            JDBCType type = parameter.getJDBCType();
+            switch(type){
+                case INTEGER:
+                case BIGINT:
+                    db2prep.setJccIntAtName(parameter.getParameterName(),Integer.class.cast(parameter.getParameterVale()));
+                    break;
+                case VARCHAR:
+                case CHAR:
+                    db2prep.setJccStringAtName(parameter.getParameterName(),String.class.cast(parameter.getParameterVale()));
+                    break;
+                case ARRAY:
+                    //Exception Error:目標伺服器上不支援資料類型 ARRAY
+                    throw new UnsupportedOperationException();
+                case FLOAT:
+                    db2prep.setJccFloatAtName(parameter.getParameterName(),Float.class.cast(parameter.getParameterVale()));
+                    break;
+                case DATE:
+                    java.util.Date d = java.util.Date.class.cast(parameter.getParameterVale());
+                    java.sql.Date sqld = new java.sql.Date(d.getTime());
+                    db2prep.setJccDateAtName(parameter.getParameterName(),sqld);
+                    break;
+                case TIME:
+                    db2prep.setJccTimeAtName(parameter.getParameterName(),Time.class.cast(parameter.getParameterVale()));
+                    break;
+                case TIMESTAMP:
+                    db2prep.setJccTimestampAtName(parameter.getParameterName(),Timestamp.class.cast(parameter.getParameterVale()));
+                    break;
+                case JAVA_OBJECT:
+                    db2prep.setJccObjectAtName(parameter.getParameterName(),parameter.getParameterVale());
+                    break;
+            }
+        } catch (SQLException sqlex) {
+            sqlex.printStackTrace();
+            throw sqlex;
         }
     }
 
     @Override
     public void close() throws SQLException {
-        if(DB2CONN != null)
-            DB2CONN.close();
+        if(DbConnection != null)
+            DbConnection.close();
     }
 }
